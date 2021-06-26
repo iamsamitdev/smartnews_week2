@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_news/Screens/Bottomnavmenu/MenuList.dart';
 import 'package:smart_news/Themes/colors.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -9,6 +10,13 @@ class HomeFragment extends StatefulWidget {
 }
 
 class _HomeFragmentState extends State<HomeFragment> {
+
+  // สร้าง Object SharedPreferences
+  SharedPreferences? sharedPreferences;
+
+  String? fname, lname, email;
+  int storeStep = 0;
+
   final List<String> imgList = [
     'https://images.unsplash.com/photo-1520342868574-5fa3804e551c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=6ff92caffcdd63681a35134a6770ed3b&auto=format&fit=crop&w=1951&q=80',
     'https://images.unsplash.com/photo-1522205408450-add114ad53fe?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=368f45b0888aeb0b7b08e3a1084d3ede&auto=format&fit=crop&w=1950&q=80',
@@ -17,6 +25,32 @@ class _HomeFragmentState extends State<HomeFragment> {
     'https://images.unsplash.com/photo-1508704019882-f9cf40e475b4?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=8c6e5e3aba713b17aa1fe71ab4f0ae5b&auto=format&fit=crop&w=1352&q=80',
     'https://images.unsplash.com/photo-1519985176271-adb1088fa94c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=a0c8d632e977f94e5d312d9893258f59&auto=format&fit=crop&w=1355&q=80'
   ];
+
+
+  getUserProfile() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+    setState(() {
+      fname = sharedPreferences!.getString('storefirstName');
+      lname = sharedPreferences!.getString('storelastName');
+      email = sharedPreferences!.getString('storeemail');
+      storeStep = sharedPreferences!.getInt('storeStep')!;
+    });
+  }
+
+  _logout() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+    // Clear ค่าของ sharedPreferences ทั้งหมด
+    // sharedPreferences!.clear();
+    sharedPreferences!.setInt('storeStep', 0);
+    Navigator.popAndPushNamed(context, '/login');
+  }
+
+
+  @override
+  void initState() { 
+    super.initState();
+    getUserProfile();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,14 +74,18 @@ class _HomeFragmentState extends State<HomeFragment> {
         child: Drawer(
           child: ListView(
             children: [
+
+              storeStep == 1 ?
               UserAccountsDrawerHeader(
-                accountName: Text('Samit Koyom'),
-                accountEmail: Text('samit@email.com'),
+                accountName: Text('$fname $lname'),
+                accountEmail: Text('$email'),
                 currentAccountPicture: CircleAvatar(
-                    // backgroundImage: AssetImage('assets/images/avatar.jpg'),
-                    ),
+                    backgroundImage: AssetImage('images/User_profile.png'),
+                ),
                 decoration: BoxDecoration(color: googleColor),
-              ),
+              )
+              :
+              Container(),
 
               // แบบแรก
               // for (final menu in menus)
@@ -57,12 +95,14 @@ class _HomeFragmentState extends State<HomeFragment> {
               //     onTap:() { menu.onTap(); },
               //   ),
 
-              MenuList(
+              storeStep == 0 ? MenuList(
                   micon: Icons.login,
                   mname: 'Login',
                   onTap: () {
                     Navigator.popAndPushNamed(context, '/login');
-                  }),
+                  })
+              : 
+              Container(),
 
               MenuList(
                   micon: Icons.new_releases,
@@ -99,12 +139,13 @@ class _HomeFragmentState extends State<HomeFragment> {
                     Navigator.popAndPushNamed(context, '/setting');
                   }),
 
-              MenuList(
+              storeStep == 1 ? MenuList(
                   micon: Icons.logout,
                   mname: 'Logout',
-                  onTap: () {
-                    print('Logout tapped');
-                  }),
+                  onTap: _logout
+              )
+              :
+              Container(),
             ],
           ),
         ),

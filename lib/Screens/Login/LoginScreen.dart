@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_news/Network/rest_api.dart';
 import 'package:smart_news/Utils/form_helper.dart';
+import 'package:smart_news/Utils/utility.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -136,8 +140,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   Center(
                     child: FormHelper.saveButton(
                       "Login",
-                      (){
+                      () async {
                         if(validateAndSave()){
+
                           print("Username: $_username");
                           print("Password: $_password");
                           
@@ -147,22 +152,45 @@ class _LoginScreenState extends State<LoginScreen> {
                           });
 
                           // เรียกใช้ API เพื่อล็อกอิน
-                          CallAPI().loginCustomer(_username, _password).then((response){
+                          var response = await CallAPI().loginCustomer(
+                            {
+                              "username":_username, 
+                              "password":_password
+                            }
+                          );
+
+                          var body = json.decode(response.body);
+                            
+                          // print(body);
+
+                          if(body['success']){
 
                             setState(() {
                               // ซ่อน Progressbar
                               this.isAPICallProcess = false;
                             });
-
-                            print(response);
-
-                            if(response){
-                              // ส่งไปหน้า dashboard
-                              Navigator.pushReplacementNamed(context, '/dashboard');
-                            }
                             
+                            // สร้าง Object SharedPreferences
+                            SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-                          });
+                            // เก็บค่าที่ต้องการลงตัวแปรแบบ sharedPreferences
+                            sharedPreferences.setString("storefirstName", body['data']['firstName']);
+                            sharedPreferences.setString("storelastName", body['data']['lastName']);
+                            sharedPreferences.setString("storeemail", body['data']['email']);
+
+                            // เก็บ step ไว้ว่าทำขั้นตอน login ไปแล้วหรือยัง
+                            sharedPreferences.setInt("storeStep", 1);
+
+                            // ส่งไปหน้า dashboard
+                            Navigator.pushReplacementNamed(context, '/dashboard');
+                          }else{
+                            // ถ้าล็อกอินผิดจะมีการแจ้งเตือนเป็น popup
+                            Utility().showAlertDialog(context, "มีข้อผิดพลาด", "ข้อมูลเข้าระบบไม่ถูกต้อง", "ตกลง");
+                            setState(() {
+                              // ซ่อน Progressbar
+                              this.isAPICallProcess = false;
+                            });
+                          }
                           
                         }
                       }

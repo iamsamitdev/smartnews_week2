@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 import 'package:smart_news/Model/LoginModel.dart';
 import 'package:smart_news/Utils/constant.dart';
@@ -16,25 +18,14 @@ class CallAPI {
   };
 
   // Login Auth
-  Future<bool> loginCustomer(String username, String password) async {
+  loginCustomer(data) async {
 
-    var response = await http.post(
+    return await http.post(
       Uri.parse(baseAPIURL+'jwt-auth/v1/token'),
       headers: _setHeadersAuth(),
-      body: {
-        "username": username,
-        "password": password
-      }
+      body: data
     );
-
-    if(response.statusCode == 200){
-      var jsonString = response.body;
-      LoginModel loginModel = loginModelFromJson(jsonString);
-      
-      return loginModel.statusCode == 200 ? true : false;
-    }
-
-    return false;
+    
   }
 
 }
