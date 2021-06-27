@@ -19,7 +19,7 @@ class HomeFragment extends StatefulWidget {
   _HomeFragmentState createState() => _HomeFragmentState();
 }
 
-class _HomeFragmentState extends State<HomeFragment> {
+class _HomeFragmentState extends State<HomeFragment> with SingleTickerProviderStateMixin {
   
   // สร้าง Object SharedPreferences
   SharedPreferences? sharedPreferences;
@@ -31,6 +31,7 @@ class _HomeFragmentState extends State<HomeFragment> {
   int? _categoryID = 0;
 
   // สร้าง TabController ไว้แสดง tab เมนู
+  int? index = 0;
   TabController? tabController;
 
   // สร้าง List ของ Tab เก็บลงตัวแปรแบบ Map
@@ -113,11 +114,15 @@ class _HomeFragmentState extends State<HomeFragment> {
     getUserProfile();
 
     // ทดสอบเรียกใช้งาน API อ่านข่าวล่าสุด
-    CallAPI().getLastNews().then((response) {
+    // CallAPI().getLastNews().then((response) {
       // print(response);
       // inspect(response);
-      print(response![0].title!.rendered);
-    });
+    //   print(response![0].title!.rendered);
+    // });
+
+    // การจัดการ Tabcontroller ให้สามารถเรียกใช้งาน state ได้ทุกครั้งที่เปลี่ยน
+    tabController = TabController(vsync: this, length: tabs.length);
+    tabController!.animation!.addListener(onTabChanged);
 
   }
 
@@ -151,12 +156,17 @@ class _HomeFragmentState extends State<HomeFragment> {
             labelStyle: TextStyle(fontSize: 18.0),
             isScrollable: true,
             onTap: (index) {
+
               // print(index);
-              setState(() {
-                _categoryID = tabCategory[index];
+              tabController!.addListener(() {
+                if(!tabController!.indexIsChanging){
+                  setState(() {
+                    _categoryID = tabCategory[index];
+                  });
+                }
               });
 
-              print(_categoryID);
+              // print(_categoryID);
             },
           ),
         ),
@@ -331,8 +341,27 @@ class _HomeFragmentState extends State<HomeFragment> {
                             return _listViewNews(news!);
                           // ถ้ากำลังโหลดข้อมูลอยู่
                           }else{
-                            return Center(
-                              child: CircularProgressIndicator(),
+                            return Padding(
+                              padding: const EdgeInsets.only(top:150.0),
+                              child: SizedBox(
+                                height: 200.0,
+                                child: Stack(
+                                  children: [
+                                    Center(
+                                      child: Container(
+                                        width: 100,
+                                        height: 100,
+                                        child: new CircularProgressIndicator(
+                                          strokeWidth: 1,
+                                          color: primaryColor,
+                                          value: 1.0,
+                                        ),
+                                      ),
+                                    ),
+                                    Center(child: Text("กำลังโหลด...")),
+                                  ],
+                                ),
+                              ),
                             );
                           }
                         }
@@ -434,4 +463,18 @@ class _HomeFragmentState extends State<HomeFragment> {
   String parseHtmlString(String? htmlString) {
     return parse(parse(htmlString).body!.text).documentElement!.text;
   }
+
+  void onTabChanged() {
+    final aniValue = tabController!.animation!.value;
+    if (aniValue > 0.5 && index != 1) {
+      setState(() {
+        index = 1;
+      });
+    } else if (aniValue <= 0.5 && index != 0) {
+      setState(() {
+        index = 0;
+      });
+    }
+  }
+
 }
