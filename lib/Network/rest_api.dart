@@ -1,7 +1,5 @@
-import 'dart:convert';
-
 import 'package:http/http.dart' as http;
-import 'package:smart_news/Model/LoginModel.dart';
+import 'package:smart_news/Model/NewsModel.dart';
 import 'package:smart_news/Utils/constant.dart';
 
 class CallAPI {
@@ -26,6 +24,38 @@ class CallAPI {
       body: data
     );
     
+  }
+
+  // เขียน API อ่านข่าวล่าสุด
+  Future<List<NewsModel>?> getLastNews() async {
+
+    final response = await http.get(
+      Uri.parse(baseAPIURL+'wp/v2/posts?per_page=10&_embed'),
+      headers: _setHeaders()
+    );
+
+    if(response.body.isNotEmpty){
+      return newsModelFromJson(response.body);
+    }else{
+      return null;
+    }
+
+  }
+
+  // เขียน API อ่านข่าวตามหมวดหมู่
+  Future<List<NewsModel>?> getNewsByCategory(id) async {
+
+    final response = await http.get(
+      Uri.parse(baseAPIURL+'wp/v2/posts?categories=$id&_embed'),
+      headers: _setHeaders()
+    );
+
+    if(response.body.isNotEmpty){
+      return newsModelFromJson(response.body);
+    }else{
+      return null;
+    }
+
   }
 
 }
