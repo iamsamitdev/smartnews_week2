@@ -1,4 +1,4 @@
-import 'dart:developer';
+// import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,7 +25,7 @@ class _HomeFragmentState extends State<HomeFragment> with SingleTickerProviderSt
   SharedPreferences? sharedPreferences;
 
   String? fname, lname, email;
-  int? storeStep = 0;
+  int? storeStep;
 
   // กำหนดหมวดหมู่เริ่มต้น
   int? _categoryID = 0;
@@ -93,10 +93,17 @@ class _HomeFragmentState extends State<HomeFragment> with SingleTickerProviderSt
   getUserProfile() async {
     sharedPreferences = await SharedPreferences.getInstance();
     setState(() {
+
       fname = sharedPreferences!.getString('storefirstName');
       lname = sharedPreferences!.getString('storelastName');
       email = sharedPreferences!.getString('storeemail');
-      storeStep = sharedPreferences!.getInt('storeStep');
+
+      if(sharedPreferences!.getInt('storeStep') != null){
+        storeStep = sharedPreferences!.getInt('storeStep')!;
+      }else{
+        storeStep = 0;
+      }
+      
     });
   }
 
@@ -105,7 +112,7 @@ class _HomeFragmentState extends State<HomeFragment> with SingleTickerProviderSt
     // Clear ค่าของ sharedPreferences ทั้งหมด
     // sharedPreferences!.clear();
     sharedPreferences!.setInt('storeStep', 0);
-    Navigator.popAndPushNamed(context, '/login');
+    Navigator.popAndPushNamed(context, '/dashboard');
   }
 
   @override
