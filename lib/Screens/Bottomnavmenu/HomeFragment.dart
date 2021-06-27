@@ -392,7 +392,9 @@ class _HomeFragmentState extends State<HomeFragment> with SingleTickerProviderSt
         NewsModel newsModel = news[index];
 
         return GestureDetector(
-          onTap: () async {},
+          onTap: () {
+            Navigator.pushNamed(context, '/newsdetail', arguments: {'id': newsModel.id});
+          },
           child: Container(
             padding: EdgeInsets.all(8),
             width: context.width(),

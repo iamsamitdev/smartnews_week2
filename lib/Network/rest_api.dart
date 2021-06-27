@@ -1,4 +1,5 @@
 import 'package:http/http.dart' as http;
+import 'package:smart_news/Model/NewsDetailModel.dart';
 import 'package:smart_news/Model/NewsModel.dart';
 import 'package:smart_news/Utils/constant.dart';
 
@@ -52,6 +53,22 @@ class CallAPI {
 
     if(response.body.isNotEmpty){
       return newsModelFromJson(response.body);
+    }else{
+      return null;
+    }
+
+  }
+
+  // เขียน API อ่านรายละเอียดข่าว
+  Future<NewsDetailModel?> getNewsDetail(id) async {
+
+    final response = await http.get(
+      Uri.parse(baseAPIURL+'wp/v2/posts/$id?_embed'),
+      headers: _setHeaders()
+    );
+
+    if(response.body.isNotEmpty){
+      return newsDetailModelFromJson(response.body);
     }else{
       return null;
     }
