@@ -8,6 +8,7 @@ import 'package:smart_news/Network/rest_api.dart';
 import 'package:smart_news/Themes/colors.dart';
 import 'package:smart_news/Utils/Widgets.dart';
 import 'package:smart_news/Utils/constant.dart';
+import 'package:flutter_html/flutter_html.dart';
 
 class NewsDetail extends StatefulWidget {
 
@@ -33,17 +34,25 @@ class _NewsDetailState extends State<NewsDetail> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    final widgetsBinding = WidgetsBinding.instance;
+
+    widgetsBinding!.addPostFrameCallback((callback) {
+      // การรับค่าจาก arguments
+      if (ModalRoute.of(context)!.settings.arguments != null) {
+        final Map arguments = ModalRoute.of(context)!.settings.arguments as Map;
+        // เรียกฟังก์ชัน readNewsDetail
+        readNewsDetail(arguments['id'].toString());
+      }
+    });
+
+  }
+
+  @override
   Widget build(BuildContext context) {
 
-    // การรับค่าจาก arguments
-    final Map arguments = ModalRoute.of(context)!.settings.arguments as Map;
-
-    // ทดสอบแสดงผล id ที่ได้มา
-    // print(arguments['id'].toString());
-
-    // เรียกฟังก์ชัน readNewsDetail
-    readNewsDetail(arguments['id'].toString());
-    
     return Scaffold(
       body: newsDetailModel != null ? NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
@@ -102,10 +111,9 @@ class _NewsDetailState extends State<NewsDetail> {
                     style: primaryTextStyle(color: Colors.blue, size: 14),
                   ).visible(newsDetailModel!.embedded!.author![0].name!.isNotEmpty),
                   10.height,
-                  Text(
-                    parseHtmlString(newsDetailModel!.content!.rendered),
-                    style: secondaryTextStyle(size: textSizeSMedium),
-                  ),
+                  
+                  Html(data: newsDetailModel!.content!.rendered),
+                  
                 ],
               ),
             ),

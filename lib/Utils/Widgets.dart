@@ -1,25 +1,22 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:smart_news/Model/NewsDetailModel.dart';
 
 import 'Images.dart';
 
 Widget placeHolderWidget(
-{
-    double? height,
+    {double? height,
     double? width,
     BoxFit? fit,
     AlignmentGeometry? alignment,
-    double? radius
-  }
-) 
-{
-return Image.asset(greyImage,
-        height: height,
-        width: width,
-        fit: fit ?? BoxFit.cover,
-        alignment: alignment ?? Alignment.center)
-    .cornerRadiusWithClipRRect(radius ?? defaultRadius);
+    double? radius}) {
+  return Image.asset(greyImage,
+          height: height,
+          width: width,
+          fit: fit ?? BoxFit.cover,
+          alignment: alignment ?? Alignment.center)
+      .cornerRadiusWithClipRRect(radius ?? defaultRadius);
 }
 
 Widget cachedImage(String url,
