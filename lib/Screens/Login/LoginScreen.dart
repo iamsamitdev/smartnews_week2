@@ -143,8 +143,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       () async {
                         if(validateAndSave()){
 
-                          print("Username: $_username");
-                          print("Password: $_password");
+                          // print("Username: $_username");
+                          // print("Password: $_password");
                           
                           setState(() {
                             // โชว์ progressbar

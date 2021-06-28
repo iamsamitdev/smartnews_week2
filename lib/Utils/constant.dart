@@ -1,5 +1,6 @@
 // API Constant
 const String baseAPIURL = 'http://192.168.1.49/flutter_news_api/wp-json/';
+// const String baseAPIURL = 'https://www.itgenius.co.th/sandbox_api/flutter_news_api/wp-json/';
 
 // System app name
 const String AppName = 'Smart News';

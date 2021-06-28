@@ -148,9 +148,9 @@ class _HomeFragmentState extends State<HomeFragment> with SingleTickerProviderSt
           ),
           actions: [
             IconButton(
-              icon: Icon(Icons.video_call),
+              icon: Image.asset(ic_video, color: Theme.of(context).textTheme.headline6!.color),
               onPressed: () {},
-            )
+            ),
           ],
           bottom: TabBar(
             tabs: tabs,
